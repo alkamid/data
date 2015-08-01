@@ -16,13 +16,47 @@
             
         #controls {
             float:left;
+            width: 40%;
             padding-top:90px;
         }
             
         #histogram {
             float:left;
+            width: 50%;
             padding-left:70px;
             padding-top:30px;
+        }
+            
+        div#total {
+            width: 50%;
+        }
+            
+        #histograms {
+            float:left;
+        }
+            
+        body {
+            font-family: 'Fira Sans';
+            background-color: #fffff9;
+        }
+            
+        button {
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 400;
+            text-transform: uppercase;
+            font-size: 14px;
+            color: #eee;
+            background-color: #333;
+            padding: 10 16;
+            margin: 6px;
+            border: none;
+            -webkit-border-radius: 10px;
+            -moz-border-radius: 10px;
+            border-radius: 10px;
+        }
+        
+        button: hover {
+            background-color: #666;
         }
             
         </style>
@@ -31,33 +65,45 @@
     <body>
     
         <div id="header">
-            <h1>Sejm VII kadencji</h1>
+                <h1>Sejm VII kadencji</h1>
         </div>
         
-        <div id="seats">
-            <svg width=1000 height=500></svg>
+        <div id="total">
+        
+            
+
+            <div id="seats">
+                <svg width=1000 height=500></svg>
+            </div>
+
+            <div>
+
+                <div id="controls">
+                    <p id="sliderText">term threshold: 1</p>
+                    <input type=range min=1 max=7 value=1 class=vertical orient=vertical></input>
+
+                    <button id='party'>by party</button>
+                    <button id='term'>by term</button>
+
+                </div>
+
+                <div id='histogram'>
+                    <svg width=400 height=220 id='histogram'></svg>
+                </div>
+
+            </div>
+
+            <div id='histograms'>
+                <svg width=1000 height=920 id='histograms'></svg>
+            </div>
+        
         </div>
-        
-        <div id="controls">
-            <select id="parties"></select>
-            <p id="sliderText">term threshold: 1</p>
-            <input type=range min=1 max=7 value=1 class=vertical orient=vertical></input>
-       
-            <button id='party'>by party</button>
-            <button id='term'>by term</button>
-        
-        </div>
-        
-        <div id='histogram'>
-            <svg width=400 height=220 id='histogram'></svg>
-        </div>
-        
-        
         
         <script>
     
             var svg = d3.select('svg')
             var svgHisto = d3.select('svg#histogram')
+            var svg_histograms = d3.select('svg#histograms')
             
             function sortPoints(byWhat, a, b){
                 if (byWhat == 'terms') {
@@ -66,9 +112,9 @@
                     if (byparty != 0)
                         return byparty
                     else {
-                        if (a.club < b.club)
+                        if (a['party_name'] < b['party_name'])
                             return -1;
-                        else if (a.club > b.club)
+                        else if (a['party_name'] > b['party_name'])
                             return 1;
                         else {
                             return d3.ascending(a.dob,b.dob)
@@ -76,9 +122,9 @@
                     }
                 }
                 else {
-                    if (a.club < b.club)
+                    if (a['party_name'] < b['party_name'])
                        return -1;
-                    if (a.club > b.club)
+                    if (a['party_name'] > b['party_name'])
                        return 1;                
                     return d3.descending(+a['recent-mp'], +b['recent-mp']) || d3.ascending(a.dob,b.dob)                                
                 }                          
@@ -93,16 +139,27 @@
         //read in the database, sort by number of terms in office, then by parliamentary club (i.e. party)
         d3.csv('data/processed.csv', function(db){
             
+            db = db.filter(function(d){
+                return d.expired == 'None'
+            })
+            
             byRecentTerm = d3.nest()
                 .key(function(d){
                     return d['recent-mp']
                 })
                 .key(function(d){
-                    return d['club']
+                    return d['party_name']
                 })
                 .sortKeys(d3.ascending)
                 .entries(db)
             
+            function name(d){
+                return d.name
+            }
+            
+            function lineVal(d){
+                return d
+            }
             
             function getTotalMPs(dataSet){
                 return d3.nest()
@@ -116,110 +173,118 @@
                     .entries(dataSet)
             }
             
-            //total mp numbers for each term value
-            mpTotals = getTotalMPs(db)
-            var sumMPs = 0
-            mpTotals.forEach(function(d){ sumMPs += d.values})
-            
-            histoScale = d3.scale.linear()
-                .domain([0, d3.max(mpTotals).values])
-                .range([0, 200])
-            
-            histoVertScale = d3.scale.linear()
-                .domain([0, 15])
-                .range([0, 0.15*sumMPs])
-            
-            var linesArr = []
-            for (var i = 1; i<Math.floor(d3.max(mpTotals).values/(0.05*sumMPs)); i++) {
-                linesArr.push(i*5)
-            }
-            
-            
-            histVertLines = svgHisto.selectAll('line')
-                .data(linesArr, lineVal)
-                .enter()
-                .append('line')
-                .attr('y1', function(d){
-                    return 200-histoVertScale(d)
-                })
-                .attr('y2', function(d){
-                    return 200-histoVertScale(d)
-                })
-                .attr('x1', 0)
-                .attr('x2', 400)
-                .style('stroke', 'black')
-                .style('opacity', 0.6)
-                .attr('stroke-dasharray', (5,5))
-            
-                 
-            histogramGroup = svgHisto.selectAll('#histoGroup')
-                .data(byRecentTerm)
-                .enter()
-                .append('g')
-                .attr('id', 'histoGroup')
-                .attr('transform', function(d, i){
-                    return 'translate (' + (30+i*50) + ', 200)'
-                })
+            function define_vertical_lines(input_data, sumMPs) {
                 
-            
-            
-            function changeHisto() {
-                var val = selectedItem.property('value')
-                newdb = db.filter(function(d){
-                            return d['club'] == val
-                        })
-                newData = d3.nest()
-                    .key(function(d){
-                        return d['recent-mp']
-                    })
-                    .key(function(d){
-                        return d['club']
-                    })
-                    .sortKeys(d3.ascending)
-                    .entries(newdb)
+                var linesArr = []
+                var maxMPs = d3.max(input_data).values
+                var maxProportion = maxMPs/sumMPs
                 
-                updateHist(newData, newdb)
-            }
+                if (Math.floor((maxProportion)/0.05) <= 5) {
+                    for (var i = 1; i<=Math.floor(maxMPs/(0.05*sumMPs)); i++) {
+                        linesArr.push(i*5)
+                    }
+                }
+                else if (Math.floor((maxProportion)/0.10) <= 5) {
+                    for (var i = 1; i<=Math.floor(maxMPs/(0.1*sumMPs)); i++) {
+                        linesArr.push(i*10)
+                    }
+                }
+                else {
+                    for (var i = 1; i<=Math.floor(maxMPs/(0.2*sumMPs)); i++) {
+                        linesArr.push(i*20)
+                    }
+                }
+                return linesArr;
+                }
+             
             
-            function updateHist(newDataSet, newdb) {
+            
+            function partyHistogram(newDataSet, newdb, i, main_histogram) {
+                
+                main_histogram = typeof main_histogram !== 'undefined' ? main_histogram : false;
+                
+                var yticks_fontsize = 15
+                var xticks_fontsize = 10
+
+                
+                if (main_histogram == true) {
+                    var bar_width = 30;
+                    var histogram_height = 200;
+                    var bar_separation = 40;
+                    var group_xtranslation = 0;
+                    var group_ytranslation = 0;
+                    var svg = svgHisto;
+                }
+                else {
+                    var bar_width = 17;
+                    var histogram_height = 110;
+                    var bar_separation = 25;
+                    var group_xtranslation = i%3*250;
+                    var group_ytranslation = (100+Math.floor(i/3)*280);
+                    var svg = svg_histograms;
+                }
                 
                 var ytrac = [0,0,0,0,0,0,0,0,0,0,0,0,0,0]
                 
-                histogramGroup.selectAll('rect')
-                    .remove()
+                histogramWhole = svg
+                                .append('g')
+                                .attr('id', 'party-histo')
+                                .attr('transform', function() { return 'translate(' + group_xtranslation + ',' + group_ytranslation + ')' })
+                                      
+
                 
-                histogramGroup.data(newDataSet)
-                
-                
-                mpTotals = getTotalMPs(newdb)
+                mpTotals = getTotalMPs(newDataSet)
                
                 var sumMPs = 0
                 mpTotals.forEach(function(d){ sumMPs += d.values})
 
                 
-                var linesArr = []
-                    for (var i = 1; i<Math.floor(d3.max(mpTotals).values/(0.05*sumMPs)); i++) {
-                        linesArr.push(i*5)
-                    }
-
+                linesArr = define_vertical_lines(mpTotals, sumMPs)
                 
                 histoScale = d3.scale.linear()
                     .domain([0, d3.max(mpTotals).values])
-                    .range([0, 200])
+                    .range([0, histogram_height])
 
                 histoVertScale = d3.scale.linear()
                     .domain([0, linesArr[linesArr.length-1]])
                     .range([0, linesArr[linesArr.length-1]*sumMPs])
                 
-                console.log(histoVertScale(20))
+            
+        
+                histVertLines = histogramWhole.selectAll('line')
+                    .data(linesArr, lineVal)
+                    .enter()
+                    .append('line')
+                    .attr('x1', 30-0.5*bar_width)
+                    .attr('x2', bar_separation*8)
+                    .style('stroke', 'black')
+                    .style('opacity', 0.2)
+                    .attr('stroke-dasharray', 3)
+                    .transition()
+                    .duration(500)
+                    .attr('y1', function(d){
+                        return 200-histoScale(d*0.01*sumMPs)
+                    })
+                    .attr('y2', function(d){
+                        return 200-histoScale(d*0.01*sumMPs)
+                    })
+                    
                 
-                
+                histogramGroup = histogramWhole.selectAll('#histoGroup')
+                .data(newdb)
+                .enter()
+                .append('g')
+                .attr('id', 'histoGroup')
+                .attr('transform', function(d){
+                    return 'translate (' + (30+(d.key-2)*bar_separation) + ', 200)';
+                })                
+                                
                 histogramGroup.selectAll('rect')
                     .data(function(d) { return d.values; })
                     .enter()
                     .append('rect')
                     
-                    .attr('width', 30)
+                    .attr('width', bar_width)
                     .attr('fill', function(d){
                         return partyColors(d.key)
                     })
@@ -234,96 +299,68 @@
                         ytrac[j] -= histoScale(d.values.length)
                         return ytrac[j]
                     })
-                
-            
-                histVertLines = svgHisto.selectAll('line')
-                    .data(linesArr, lineVal)
-                    .exit()
-                    .remove()
-            
-                histVertLines = svgHisto.selectAll('line')
-                    .data(linesArr, lineVal)
-                    .attr('x1', 0)
-                    .attr('x2', 400)
-                    .style('stroke', 'black')
-                    .style('opacity', 0.6)
-                    .attr('stroke-dasharray', (5,5))
-                    .transition()
-                    .duration(500)
-                    .attr('y1', function(d){
-                        return 200-histoScale(d*0.01*sumMPs)
-                    })
-                    .attr('y2', function(d){
-                        return 200-histoScale(d*0.01*sumMPs)
-                    })
 
-                    
-            
-            }
-            
-            var ytrac = [0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-            
-            histogramGroup.selectAll('rect')
-                .data(function(d) { return d.values; })
-                .enter()
-                .append('rect')
-                .attr('height', function(d){
-                    return histoScale(d.values.length)
-                })
-                .attr('y', function(d,i,j){
-                    ytrac[j] -= histoScale(d.values.length)
-                    return ytrac[j]
-                })
-                .attr('width', 30)
-                .attr('fill', function(d){
-                    return partyColors(d.key)
-                })
-
-            
-            
-            
-            //add labels over the histogram
-            svgHisto.selectAll('#histoGroup')
+            //add labels above the bars
+            histogramWhole.selectAll('#histoGroup')
                 .data(mpTotals)
                 .append('text')
+                .attr('font-family', 'Fira Sans')
+                .attr('font-size', yticks_fontsize)
                 .text(function(d){
                     return ''+d.values
                 })
                 .attr('y', function(d, i){
                     return ytrac[i] - 10
                 })
+                .attr('x', function(d){
+                    return (bar_width/2)-(d.values.toString().length*yticks_fontsize*0.5/2)
+                })
+            
             
             //add x axis ticks
-            svgHisto.selectAll('#histoGroup')
+            histogramWhole.selectAll('#histoGroup')
                 .data(mpTotals)
                 .append('text')
-                .text(function(d,i){
-                    return ''+(i+1)
+                .attr('font-family', 'Fira Sans')
+                .attr('font-size', xticks_fontsize)
+                .text(function(d){
+                    return ''+(d.key-1)
                 })
                 .attr('y', 20)
-                .attr('x', 10)
+                .attr('x', (bar_width/2)-(xticks_fontsize*0.5/2)) // this is a crude method to center the text. There must be a better one
             
-            svgHisto.append('text')
+            console.log(newDataSet)
+
+            if (main_histogram != true) {
+            
+            var title = newDataSet[0]['party_name']
+            histogramWhole.append('text')
+                .text(title)
+                .attr('font-family', 'Fira Sans')
+                .attr('font-size', 15)
+                .attr('x', 30)
+                .attr('y', 10)        
+            
+            }
+            else {
+                histogramWhole.append('text')
                 .text('terms: ')
                 .attr('x', -30)
-                .attr('y', 220)
-             
-            
-            function name(d){
-                return d.name
+                .attr('y', 220)        
+            }
             }
             
-            function lineVal(d){
-                return d
-            }
+            // draw the main histogram (with all parties)
+            partyHistogram(db, byRecentTerm, 1, true)
+            
+
+            
            
            db.sort(function(a,b){
-               return sortPoints('party', a, b)
+               return sortPoints('party_name', a, b)
            })
            
-           db = db.filter(function(d){
-                return d.expired == 'None'
-           })
+           
            
             svg.selectAll('rect')
                 .data(db, name)
@@ -343,15 +380,15 @@
                     return scale*d['recent-mp']
                 })
                 .attr('fill', function(d){
-                    return partyColors(d.club)
+                    return partyColors(d['party_name'])
                 })
                 .on('mouseover', function(d){
                     svg.append('text')
                         .attr('id', 'tooltip')
                         .attr('font-family', 'Fira Sans')
-                        .text(d.name)
-                        .attr('x', 200)
-                        .attr('y', 450)
+                        .text(d.name + ' (' + d.party_acronym + ')')
+                        .attr('x', 50)
+                        .attr('y', 455)
                     
                     svg.select('g#termBarGroup').selectAll('rect')
                         .data(d['history-mp'].split(':'))
@@ -406,9 +443,7 @@
                     return d3.sum(termDuration.slice(0, i))*15+i*3-10
                 })
             
-            
-            //console.log(test)
-            
+
             d3.select('body').select('.vertical')
                 .on('change', function(d) {
                     var val = this.value
@@ -459,34 +494,48 @@
                     
             parties = d3.nest()
                 .key(function(d){
-                    return d.club
+                    return d['party_name']
                 })
                 .entries(db)
             
-            d3.select('select#parties').selectAll('option')
-                .data(parties)
-                .enter()
-                .append('option')
-                .text(function(d){
-                    return d.key
-                })
             
-            var selectedItem = d3.select('select#parties').on('change', changeHisto)
+            
+            
+            parties.forEach(function(d, i){
+                newdb = db.filter(function(e){
+                            return e['party_name'] == d.key
+                        })
+                newData = d3.nest()
+                    .key(function(e){
+                        return e['recent-mp']
+                    })
+                    .key(function(e){
+                        return e['party_name']
+                    })
+                    .sortKeys(d3.ascending)
+                    .entries(newdb)
                 
-            
-            function partyColors(club){
-                switch (club) {
-                    case 'Klub Parlamentarny Platforma Obywatelska':
-                        return 'darkorange';
-                    case 'Klub Parlamentarny Prawo i Sprawiedliwość':
-                        return 'darkblue';
-                    case 'Klub Parlamentarny Polskiego Stronnictwa Ludowego':
-                        return '#4daf4a';
-                    case 'Klub Poselski Sojusz Lewicy Demokratycznej':
-                        return 'red';
-                    case 'Klub Parlamentarny Zjednoczona Prawica':
-                        return '#377eb8';
 
+                partyHistogram(newdb, newData, i)
+            })
+                            
+            
+            function partyColors(party_name){
+                switch (party_name) {
+                    case 'Platforma Obywatelska':
+                        return 'darkorange';
+                    case 'Prawo i Sprawiedliwość':
+                        return 'darkblue';
+                    case 'Polskie Stronnictwo Ludowe':
+                        return '#4daf4a';
+                    case 'Sojusz Lewicy Demokratycznej':
+                        return 'red';
+                    case 'Zjednoczona Prawica':
+                        return '#377eb8';
+                    case 'Ruch Palikota':
+                        return '#FFB964';
+                    case 'Biało-Czerwoni':
+                        return '#D46A6A';
                     default:
                         return 'grey';
                 }
