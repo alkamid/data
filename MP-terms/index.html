@@ -10,29 +10,42 @@
         #header {
             background-color:black;
             color:white;
+            width: 850px;
             text-align:center;
             padding:5px;
         }
             
-        #controls {
+        div#controls {
             float:left;
-            width: 40%;
-            padding-top:90px;
+            text-align: center;
+            padding-top:30px;
+            padding-left:40px;
         }
             
-        #histogram {
-            float:left;
-            width: 50%;
-            padding-left:70px;
+        div#histogram {
+            float:right;
+            text-align: center;
             padding-top:30px;
         }
             
-        div#total {
-            width: 50%;
+        div#histograms {
+            text-align: center;
+            padding-top: 20px;
+
         }
             
-        #histograms {
-            float:left;
+        div#middle {
+            width: 100%;
+            height: 370px;
+            margin-top: 10px;
+        }
+            
+        div#seats {
+            text-align: center;
+        }
+            
+        div#total {
+            width: 850px;
         }
             
         body {
@@ -65,7 +78,7 @@
     <body>
     
         <div id="header">
-                <h1>Sejm VII kadencji</h1>
+                <h1>Polish Parliament, 7th term</h1>
         </div>
         
         <div id="total">
@@ -73,28 +86,39 @@
             
 
             <div id="seats">
-                <svg width=1000 height=500></svg>
+                
+                <p style='text-align: left; padding-left:30px;'>It's 2015, the election year in Poland. I've recently heard an interesting idea from one of the parties: to limit the number of consecutive terms that one person can sit in the parliament to two. In other words, after you've served two terms, you cannot run for the seat again, but you have to take a break.</p>
+                <p style='text-align: left; padding-left:30px;'>This is a tool to provide evidence for discussion of 'professional parliamentarism'. There is not much to play around with, I just wanted to present the data in a clear way. If you have any comments, I tweet on <a href='http://twitter.com/aklimont'>@aklimont</a>.</p>
+                
+                <br />
+                <h2 style='display: inline'>SEATS IN THE PARLIAMENT</h2>
+                <br />
+                <p style='display: inline'>(squares = MPs, colour = party, size = terms in office)</p>
+                <svg width=850 height=500></svg>
             </div>
 
-            <div>
+            <div id="middle">
 
                 <div id="controls">
+                    <h2>CONTROL</h2>
                     <p id="sliderText">term threshold: 1</p>
                     <input type=range min=1 max=7 value=1 class=vertical orient=vertical></input>
-
+                    <br />
                     <button id='party'>by party</button>
                     <button id='term'>by term</button>
 
                 </div>
 
                 <div id='histogram'>
-                    <svg width=400 height=220 id='histogram'></svg>
+                    <h2>ALL MPs</h2>
+                    <svg width=400 height=260 id='histogram'></svg>
                 </div>
 
             </div>
 
             <div id='histograms'>
-                <svg width=1000 height=920 id='histograms'></svg>
+                <h2>MPs BY PARTY</h2>
+                <svg width=850 height=920 id='histograms'></svg>
             </div>
         
         </div>
@@ -157,10 +181,6 @@
                 return d.name
             }
             
-            function lineVal(d){
-                return d
-            }
-            
             function getTotalMPs(dataSet){
                 return d3.nest()
                     .key(function(d){
@@ -209,19 +229,21 @@
                 
                 if (main_histogram == true) {
                     var bar_width = 30;
-                    var histogram_height = 200;
+                    var histogram_height = 220;
                     var bar_separation = 40;
                     var group_xtranslation = 0;
-                    var group_ytranslation = 0;
+                    var group_ytranslation = 40;
                     var svg = svgHisto;
+                    var histoGroup_xoffset = 60;
                 }
                 else {
                     var bar_width = 17;
                     var histogram_height = 110;
                     var bar_separation = 25;
-                    var group_xtranslation = i%3*250;
-                    var group_ytranslation = (100+Math.floor(i/3)*280);
+                    var group_xtranslation = i%3*300;
+                    var group_ytranslation = (30+Math.floor(i/3)*280);
                     var svg = svg_histograms;
+                    var histoGroup_xoffset = 30;
                 }
                 
                 var ytrac = [0,0,0,0,0,0,0,0,0,0,0,0,0,0]
@@ -249,26 +271,42 @@
                     .domain([0, linesArr[linesArr.length-1]])
                     .range([0, linesArr[linesArr.length-1]*sumMPs])
                 
-            
-        
+                
+                console.log(linesArr)
                 histVertLines = histogramWhole.selectAll('line')
-                    .data(linesArr, lineVal)
+                    .data(linesArr)
                     .enter()
                     .append('line')
-                    .attr('x1', 30-0.5*bar_width)
-                    .attr('x2', bar_separation*8)
+                    .attr('x1', histoGroup_xoffset-0.5*bar_width)
+                    .attr('x2', bar_separation*8.5)
                     .style('stroke', 'black')
                     .style('opacity', 0.2)
                     .attr('stroke-dasharray', 3)
                     .transition()
                     .duration(500)
                     .attr('y1', function(d){
+                        console.log(d)
                         return 200-histoScale(d*0.01*sumMPs)
                     })
                     .attr('y2', function(d){
                         return 200-histoScale(d*0.01*sumMPs)
                     })
+                
+                histVerLineLabels = histogramWhole.selectAll('text')
+                    .data(linesArr)
+                    .enter()
+                    .append('text')
+                    .attr('x', bar_separation*8.5)
+                    .attr('y', function(d){
+                        return 200-histoScale(d*0.01*sumMPs)
+                    })
+                    .text(function(d){
+                        return d + '%'
+                    })
+                    .style('fill-opacity', 0.5)
+                    .attr('font-size', xticks_fontsize)
                     
+                
                 
                 histogramGroup = histogramWhole.selectAll('#histoGroup')
                 .data(newdb)
@@ -276,7 +314,7 @@
                 .append('g')
                 .attr('id', 'histoGroup')
                 .attr('transform', function(d){
-                    return 'translate (' + (30+(d.key-2)*bar_separation) + ', 200)';
+                    return 'translate (' + (histoGroup_xoffset+(d.key-2)*bar_separation) + ', 200)';
                 })                
                                 
                 histogramGroup.selectAll('rect')
@@ -329,8 +367,6 @@
                 .attr('y', 20)
                 .attr('x', (bar_width/2)-(xticks_fontsize*0.5/2)) // this is a crude method to center the text. There must be a better one
             
-            console.log(newDataSet)
-
             if (main_histogram != true) {
             
             var title = newDataSet[0]['party_name']
@@ -345,7 +381,7 @@
             else {
                 histogramWhole.append('text')
                 .text('terms: ')
-                .attr('x', -30)
+                .attr('x', 0)
                 .attr('y', 220)        
             }
             }
@@ -371,7 +407,7 @@
                     return (50+(Math.floor(i/rows))*xSpacing)
                 })
                 .attr('y', function(d,i){
-                    return (50+(i%rows)*ySpacing)
+                    return (20+(i%rows)*ySpacing)
                 })
                 .attr('width', function(d){
                     return scale*d['recent-mp']
