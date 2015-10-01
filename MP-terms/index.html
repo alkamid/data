@@ -5,72 +5,92 @@
         <meta charset="utf-8">
         
         <script src='d3.min.js'></script>
-        <style>input.vertical { -webkit-appearance: slider-vertical; writing-mode: bt-lr; }
+        <link href='https://fonts.googleapis.com/css?family=Fira+Sans&subset=latin-ext' rel='stylesheet' type='text/css'>
+        <style>
+            
+            font-family: 'Fira Sans', sans-serif;
+            
+            input.vertical {
+                -webkit-appearance: slider-vertical;
+                writing-mode: bt-lr;
+            }
         
-        #header {
-            background-color:black;
-            color:white;
-            width: 850px;
-            text-align:center;
-            padding:5px;
-        }
-            
-        div#controls {
-            float:left;
-            text-align: center;
-            padding-top:30px;
-            padding-left:40px;
-        }
-            
-        div#histogram {
-            float:right;
-            text-align: center;
-            padding-top:30px;
-        }
-            
-        div#histograms {
-            text-align: center;
-            padding-top: 20px;
+            #header {
+                background-color:black;
+                color:white;
+                width: 850px;
+                text-align:center;
+                padding:5px;
+            }
 
-        }
+            div#controls {
+                float:left;
+                text-align: center;
+                padding-top:30px;
+                padding-left:40px;
+            }
+
+            div#histogram {
+                float:right;
+                text-align: center;
+                padding-top:30px;
+            }
+
+            div#histograms {
+                text-align: center;
+                padding-top: 20px;
+
+            }
+
+            div#middle {
+                width: 100%;
+                height: 390px;
+                margin-top: 10px;
+            }
+
+            div#seats {
+                text-align: center;
+            }
+
+            div#leftcolumn {
+                width: 850px;
+                float: left;
+            }
             
-        div#middle {
-            width: 100%;
-            height: 370px;
-            margin-top: 10px;
-        }
+            div#rightcolumn {
+                width: 300px;
+                float: right;
+                margin-top: 550px;
+            }
             
-        div#seats {
-            text-align: center;
-        }
-            
-        div#total {
-            width: 850px;
-        }
-            
-        body {
-            font-family: 'Fira Sans';
-            background-color: #fffff9;
-        }
-            
-        button {
-            font-family: 'Open Sans', sans-serif;
-            font-weight: 400;
-            text-transform: uppercase;
-            font-size: 14px;
-            color: #eee;
-            background-color: #333;
-            padding: 10 16;
-            margin: 6px;
-            border: none;
-            -webkit-border-radius: 10px;
-            -moz-border-radius: 10px;
-            border-radius: 10px;
-        }
-        
-        button: hover {
-            background-color: #666;
-        }
+            div#total {
+                width: 1150px;
+            }
+
+            body {
+                font-family: 'Fira Sans';
+                background-color: #fffff9;
+            }
+
+            button {
+                font-family: 'Open Sans', sans-serif;
+                font-weight: 400;
+                text-transform: uppercase;
+                font-size: 14px;
+                color: #eee;
+                background-color: #333;
+                padding: 10 16;
+                margin: 6px;
+                border: none;
+                -webkit-border-radius: 10px;
+                -moz-border-radius: 10px;
+                border-radius: 10px;
+            }
+
+            button: hover
+            {
+                background-color: #666;
+            }
             
         </style>
     </head>
@@ -78,49 +98,71 @@
     <body>
     
         <div id="header">
-                <h1>Polish Parliament, 7th term</h1>
+                <!--<h1>Polish Parliament, 7th term</h1>-->
+                <h1>Sejm RP VII kadencji</h1>
         </div>
         
-        <div id="total">
+        <div id='total'>
         
-            
+        
+            <div id="leftcolumn">
 
-            <div id="seats">
-                
-                <p style='text-align: left; padding-left:30px;'>It's 2015, the election year in Poland. I've recently heard an interesting idea from one of the parties: to limit the number of consecutive terms that one person can sit in the parliament to two. In other words, after you've served two terms, you cannot run for the seat again, but you have to take a break.</p>
-                <p style='text-align: left; padding-left:30px;'>This is a tool to provide evidence for discussion of 'professional parliamentarism'. There is not much to play around with, I just wanted to present the data in a clear way. If you have any comments, I tweet on <a href='http://twitter.com/aklimont'>@aklimont</a>.</p>
-                
-                <br />
-                <h2 style='display: inline'>SEATS IN THE PARLIAMENT</h2>
-                <br />
-                <p style='display: inline'>(squares = MPs, colour = party, size = terms in office)</p>
-                <svg width=850 height=500></svg>
-            </div>
 
-            <div id="middle">
 
-                <div id="controls">
-                    <h2>CONTROL</h2>
-                    <p id="sliderText">term threshold: 1</p>
-                    <input type=range min=1 max=7 value=1 class=vertical orient=vertical></input>
+                <div id="seats">
+
+                    <!-- <p style='text-align: left; padding-left:30px;' lang='en'>It's 2015, the election year in Poland. I've recently heard an interesting idea from one of the parties: to limit the number of consecutive terms that one person can sit in the parliament to two. In other words, after you've served two terms, you cannot run for the seat again and you have to take a break.</p>
+                    <p style='text-align: left; padding-left:30px;' lang='en'>This is a tool to provide evidence for discussion of 'professional parliamentarism'. There is not much to play around with, I just wanted to present the data in a clear way. If you have any comments, I tweet on <a href='http://twitter.com/aklimont'>@aklimont</a>.</p> -->
+                    <p style='text-align: left; padding-left:30px;' lang='pl'>Jest rok 2015, w Polsce zbliżają się wybory do parlamentu. Do debaty publicznej nieśmiało próbuje przebić się temat kadencyjności posłów, szczególnie dzięki stowarzyszeniu .Nowoczesna. Proponują oni ograniczyć liczbę kolejnych kadencji do dwóch — po tym czasie poseł musiałby na jakiś czas odpocząć od posłowania.</p>
+                    <p style='text-align: left; padding-left:30px;' lang='pl'><a href='https://pl.wikipedia.org/wiki/Heurystyka_dost%C4%99pno%C5%9Bci'>Heurystyka dostępności</a> może sprawiać że gdy myślimy o kadencyjności, do głowy przychodzą nam zazwyczaj znani posłowie, którzy rzeczywiście w Sejmie są od dawna. Możemy więc dojść do wniosku, że nasz parlament składa się niemal wyłącznie ze starych wygów.</p>
+                    <p style='text-align: left; padding-left:30px;' lang='pl'>Poniższa wizualizacja ma za zadanie ułatwić debatę na ten temat. Nie jest bardzo interaktywna, chciałem po prostu przejrzyście zaprezentować dane (które pochodzą ze <a href='http://www.sejm.gov.pl/Sejm7.nsf/poslowie.xsp?type=A'>stron Sejmu)</a>. Komentarze mile widziane na <a href='http://twitter.com/aklimont'>@aklimont</a>.
+
+                    <p style='text-align: left; padding-left:30px;' lang='pl'>Strona działa w Chrome i Firefoksie, raczej nie działa w IE.</p>             
                     <br />
-                    <button id='party'>by party</button>
-                    <button id='term'>by term</button>
+                    <!-- <h2 style='display: inline'>SEATS IN THE PARLIAMENT</h2>-->
+                    <h2 style='display: inline'>POSŁOWIE W SEJMIE</h2>
+                    <br />
+                    <!-- <p style='display: inline'>(squares = MPs, colour = party, size = terms in office)</p> -->
+                    <p style='display: inline'>(kwadraty = posłowie, wielkość = liczba kadencji; najedź na kwadrat by zobaczyć nazwisko)</p>
+                    <svg width=850 height=500></svg>
+                </div>
+
+                <div id="middle">
+
+                    <div id="controls">
+                        <!--<h2>CONTROL</h2>-->
+                        <h2>KONTROLA</h2>
+
+                        <!--<p id="sliderText">term threshold: 1</p>-->
+                        <p id="sliderText">próg kadencji: 1</p>
+
+                        <input type=range min=1 max=7 value=1 class=vertical orient=horizontal></input>
+                        <br />
+                        <!--<button id='party'>by party</button>
+                        <button id='term'>by term</button>-->
+                        <button id='party'>wg partii</button>
+                        <button id='term'>wg kadencji</button>
+
+                    </div>
+
+                    <div id='histogram'>
+                        <!--<h2>ALL MPs</h2>-->
+                        <h2>WSZYSCY POSŁOWIE</h2>
+                        <svg width=420 height=270 id='histogram'></svg>
+                    </div>
 
                 </div>
 
-                <div id='histogram'>
-                    <h2>ALL MPs</h2>
-                    <svg width=400 height=260 id='histogram'></svg>
+                <div id='histograms'>
+                    <!--<h2>MPs BY PARTY</h2>-->
+                    <h2>Posłowie wg partii</h2>
+                    <svg width=850 height=920 id='histograms'></svg>
                 </div>
 
             </div>
-
-            <div id='histograms'>
-                <h2>MPs BY PARTY</h2>
-                <svg width=850 height=920 id='histograms'></svg>
+            <div id='rightcolumn'>
+                <svg width=300 height=200 id='color_legend'></svg>
             </div>
-        
         </div>
         
         <script>
@@ -234,7 +276,7 @@
                     var group_xtranslation = 0;
                     var group_ytranslation = 40;
                     var svg = svgHisto;
-                    var histoGroup_xoffset = 60;
+                    var histoGroup_xoffset = 80;
                 }
                 else {
                     var bar_width = 17;
@@ -272,7 +314,6 @@
                     .range([0, linesArr[linesArr.length-1]*sumMPs])
                 
                 
-                console.log(linesArr)
                 histVertLines = histogramWhole.selectAll('line')
                     .data(linesArr)
                     .enter()
@@ -285,7 +326,6 @@
                     .transition()
                     .duration(500)
                     .attr('y1', function(d){
-                        console.log(d)
                         return 200-histoScale(d*0.01*sumMPs)
                     })
                     .attr('y2', function(d){
@@ -380,7 +420,8 @@
             }
             else {
                 histogramWhole.append('text')
-                .text('terms: ')
+                //.text('terms: ')
+                .text('kadencje: ')
                 .attr('x', 0)
                 .attr('y', 220)        
             }
@@ -500,7 +541,8 @@
                         })
                     d3.select('p#sliderText')
                         .text(function(){
-                            return 'term threshold: ' + val
+                            //return 'term threshold: ' + val
+                            return 'próg kadencji: ' + val
                         })
                     
                 })
@@ -521,7 +563,7 @@
                             return (50+(Math.floor(i/rows))*xSpacing)
                         })
                         .attr('y', function(d,i){
-                            return (50+(i%rows)*ySpacing)
+                            return (20+(i%rows)*ySpacing)
                         })
                     
                     
@@ -534,6 +576,34 @@
                 })
                 .entries(db)
             
+            var svg_legend = d3.select('svg#color_legend')
+            
+            svg_legend.selectAll('g')
+                .data(parties)
+                .enter()
+                .append('g')
+                .attr('id', 'legend_group')
+                .attr('transform', function(d, i){
+                    return 'translate(0, ' + (5+i*25) + ')'
+                })
+                
+            svg_legend.selectAll('g#legend_group')
+                .data(parties)
+                .append('rect')
+                .style('fill', function(d){
+                    return partyColors(d.key)
+                })
+                .attr('height', 10)
+                .attr('width', 30)
+            
+            svg_legend.selectAll('g#legend_group')
+                .data(parties)
+                .append('text')
+                .text(function(d){
+                    return d.key
+                })
+                .attr('x', 40)
+                .attr('y', 10)
             
             
             
