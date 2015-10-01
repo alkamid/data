@@ -1,15 +1,10 @@
 <html>
 
     <head>
-
-
-      <title>Wizualizacja kadencyjności posłów — Alkamid</title>
-      <meta name="description" content="Wizualizacja kadencyjności posłów VII kadencji Sejmu RP wykonana w d3.js.">
-      <meta name="keywords" content="wizualizacja, sejm, kadencyjność">
-
+        
         <meta charset="utf-8">
         
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.5/d3.min.js" charset="utf-8"></script>
+        <script src='d3.min.js'></script>
         <link href='https://fonts.googleapis.com/css?family=Fira+Sans&subset=latin-ext' rel='stylesheet' type='text/css'>
         <style>
             
@@ -30,15 +25,17 @@
 
             div#controls {
                 float:left;
-                text-align: center;
+                text-align: left;
                 padding-top:30px;
                 padding-left:40px;
+                width: 30%;
             }
 
             div#histogram {
                 float:right;
                 text-align: center;
                 padding-top:30px;
+                width: 65%;
             }
 
             div#histograms {
@@ -48,25 +45,28 @@
             }
 
             div#middle {
-                width: 100%;
-                height: 390px;
+                width: 850px;
+                height: 430px;
                 margin-top: 10px;
             }
 
             div#seats {
                 text-align: center;
+                width: 850px;
+                float: left;
+            }
+            
+            div#seats_legend {
+                width: 300px;
+                float: right;
             }
 
             div#leftcolumn {
                 width: 850px;
                 float: left;
+                text-align:center;
             }
             
-            div#rightcolumn {
-                width: 300px;
-                float: right;
-                margin-top: 550px;
-            }
             
             div#total {
                 width: 1150px;
@@ -92,7 +92,7 @@
                 border-radius: 10px;
             }
 
-            button: hover
+            button: 
             {
                 background-color: #666;
             }
@@ -113,14 +113,11 @@
             <div id="leftcolumn">
 
 
-
-                <div id="seats">
-
                     <!-- <p style='text-align: left; padding-left:30px;' lang='en'>It's 2015, the election year in Poland. I've recently heard an interesting idea from one of the parties: to limit the number of consecutive terms that one person can sit in the parliament to two. In other words, after you've served two terms, you cannot run for the seat again and you have to take a break.</p>
                     <p style='text-align: left; padding-left:30px;' lang='en'>This is a tool to provide evidence for discussion of 'professional parliamentarism'. There is not much to play around with, I just wanted to present the data in a clear way. If you have any comments, I tweet on <a href='http://twitter.com/aklimont'>@aklimont</a>.</p> -->
-                    <p style='text-align: left; padding-left:30px;' lang='pl'>Jest rok 2015, w Polsce zbliżają się wybory do parlamentu. Do debaty publicznej nieśmiało próbuje przebić się temat kadencyjności posłów, szczególnie dzięki stowarzyszeniu .Nowoczesna. Proponują oni ograniczyć liczbę kolejnych kadencji do dwóch — po tym czasie poseł musiałby na jakiś czas odpocząć od posłowania.</p>
-                    <p style='text-align: left; padding-left:30px;' lang='pl'><a href='https://pl.wikipedia.org/wiki/Heurystyka_dost%C4%99pno%C5%9Bci'>Heurystyka dostępności</a> może sprawiać że gdy myślimy o kadencyjności, do głowy przychodzą nam zazwyczaj znani posłowie, którzy rzeczywiście w Sejmie są od dawna. Możemy więc dojść do wniosku, że nasz parlament składa się niemal wyłącznie z zawodowych polityków.</p>
-                    <p style='text-align: left; padding-left:30px;' lang='pl'>Poniższa wizualizacja ma za zadanie ułatwić debatę na ten temat. Nie jest bardzo interaktywna, chciałem po prostu przejrzyście zaprezentować dane (które pochodzą ze <a href='http://www.sejm.gov.pl/Sejm7.nsf/poslowie.xsp?type=A'>stron Sejmu)</a>. Komentarze mile widziane na <a href='http://twitter.com/aklimont'>@aklimont</a>.
+                    <p style='text-align: left; padding-left:30px;' lang='pl'>Jest rok 2015, w Polsce zbliżają się wybory do parlamentu. Do debaty publicznej nieśmiało próbuje przebić się temat kadencyjności posłów, szczególnie dzięki stowarzyszeniu NowoczesnaPL. Proponują oni ograniczyć liczbę kolejnych kadencji do dwóch - po tym czasie poseł musiałby na jakiś czas odpocząć od posłowania.</p>
+                    <p style='text-align: left; padding-left:30px;' lang='pl'><a href='https://pl.wikipedia.org/wiki/Heurystyka_dost%C4%99pno%C5%9Bci'>Heurystyka dostępności</a> może sprawiać że gdy myślimy o kadencyjności, do głowy przychodzą nam zazwyczaj znani posłowie, którzy rzeczywiście w Sejmie są od dawna. Możemy więc dojść do  wniosku, że nasz parlament składa się niemal wyłącznie ze starych wyg i wygów.</p>
+                    <p style='text-align: left; padding-left:30px;' lang='pl'>Poniższa wizualizacja ma za zadanie ułatwić debatę na temat kadencyjności. Nie jest bardzo interaktywna, chciałem po prostu przejrzyście zaprezentować dane (które pochodzą ze <a href='http://www.sejm.gov.pl/Sejm7.nsf/poslowie.xsp?type=A'>stron Sejmu)</a>. Komentarze mile widziane na <a href='http://twitter.com/aklimont'>@aklimont</a>.
 
                     <p style='text-align: left; padding-left:30px;' lang='pl'>Strona działa w Chrome i Firefoksie, raczej nie działa w IE.</p>             
                     <br />
@@ -129,31 +126,42 @@
                     <br />
                     <!-- <p style='display: inline'>(squares = MPs, colour = party, size = terms in office)</p> -->
                     <p style='display: inline'>(kwadraty = posłowie, wielkość = liczba kadencji; najedź na kwadrat by zobaczyć nazwisko)</p>
-                    <svg width=850 height=500></svg>
                 </div>
-
-                <div id="middle">
-
-                    <div id="controls">
-                        <!--<h2>CONTROL</h2>-->
-                        <h2>KONTROLA</h2>
-
-                        <!--<p id="sliderText">term threshold: 1</p>-->
-                        <p id="sliderText">próg kadencji: 1</p>
-
-                        <input type=range min=1 max=7 value=1 class=vertical orient=horizontal></input>
-                        <br />
+                <div id="seats">    
+                    <svg width=1150 height=500 id='seats'></svg>
+                </div>
+                <div id='seats_legend'>
                         <!--<button id='party'>by party</button>
                         <button id='term'>by term</button>-->
                         <button id='party'>wg partii</button>
+                        <br />
                         <button id='term'>wg kadencji</button>
+                </div>
+                <div id='leftcolumn'>
+                <div id="middle">
+
+                    <div id="controls">
+
+                        <!--<p id="sliderText">term threshold: 1</p>-->
+                        <p id="sliderText">próg kadencji: 1</p>
+                        
+                        <input type=range min=1 max=7 value=1 class=vertical orient=horizontal></input>
+                        <br />
+                        Suwak służy do wyróżniania <em>długoterminowych</em> posłów. Np. '5' oznacza, że wyróżnieni zostaną tylko posłowie, którzy w Sejmie zasiadają od pięciu kadencji lub dłużej.
+                        
+                        <br /><br />
+                    
+                        Wykres po lewej przedstawia wszystkich posłów w Sejmie; kolory oznaczają przynależność do klubów. Np. jest 35 posłów, których obecna kadencja jest czwartą z rzędu.
+
 
                     </div>
 
                     <div id='histogram'>
                         <!--<h2>ALL MPs</h2>-->
                         <h2>WSZYSCY POSŁOWIE</h2>
-                        <svg width=420 height=270 id='histogram'></svg>
+                        <svg width=520 height=330 id='histogram'></svg>
+                        
+
                     </div>
 
                 </div>
@@ -165,14 +173,12 @@
                 </div>
 
             </div>
-            <div id='rightcolumn'>
-                <svg width=300 height=200 id='color_legend'></svg>
-            </div>
+
         </div>
         
         <script>
     
-            var svg = d3.select('svg')
+            var svg = d3.select('svg#seats')
             var svgHisto = d3.select('svg#histogram')
             var svg_histograms = d3.select('svg#histograms')
             
@@ -208,7 +214,7 @@
         
         
         //read in the database, sort by number of terms in office, then by parliamentary club (i.e. party)
-        d3.csv('data/7th_term.csv', function(db){
+        d3.csv('data/processed.csv', function(db){
             
             db = db.filter(function(d){
                 return d.expired == 'None'
@@ -275,11 +281,11 @@
 
                 
                 if (main_histogram == true) {
-                    var bar_width = 30;
-                    var histogram_height = 220;
-                    var bar_separation = 40;
+                    var bar_width = 40;
+                    var histogram_height = 280;
+                    var bar_separation = 58;
                     var group_xtranslation = 0;
-                    var group_ytranslation = 40;
+                    var group_ytranslation = 100;
                     var svg = svgHisto;
                     var histoGroup_xoffset = 80;
                 }
@@ -442,9 +448,9 @@
                return sortPoints('party_name', a, b)
            })
            
+           /* Draw all MPs as rectangles */
            
-           
-            svg.selectAll('rect')
+           svg.selectAll('rect')
                 .data(db, name)
                 .enter()
                 .append('rect')
@@ -581,18 +587,16 @@
                 })
                 .entries(db)
             
-            var svg_legend = d3.select('svg#color_legend')
-            
-            svg_legend.selectAll('g')
+            svg.selectAll('g#legend_group')
                 .data(parties)
                 .enter()
                 .append('g')
                 .attr('id', 'legend_group')
                 .attr('transform', function(d, i){
-                    return 'translate(0, ' + (5+i*25) + ')'
+                    return 'translate(850, ' + (370-i*25) + ')'
                 })
                 
-            svg_legend.selectAll('g#legend_group')
+            svg.selectAll('g#legend_group')
                 .data(parties)
                 .append('rect')
                 .style('fill', function(d){
@@ -601,7 +605,7 @@
                 .attr('height', 10)
                 .attr('width', 30)
             
-            svg_legend.selectAll('g#legend_group')
+            svg.selectAll('g#legend_group')
                 .data(parties)
                 .append('text')
                 .text(function(d){
