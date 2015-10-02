@@ -4,8 +4,7 @@
         
         <meta charset="utf-8">
         
-        <!--<script src='d3.min.js'></script>-->
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.5/d3.min.js" charset="utf-8"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.5/d3.min.js" charset="utf-8"></script>
         <link href='https://fonts.googleapis.com/css?family=Fira+Sans&subset=latin-ext' rel='stylesheet' type='text/css'>
         <style>
             
@@ -214,7 +213,7 @@
         
         
         //read in the database, sort by number of terms in office, then by parliamentary club (i.e. party)
-        d3.csv('data/processed.csv', function(db){
+        d3.csv('data/7th_term.csv', function(db){
             
             db = db.filter(function(d){
                 return d.expired == 'None'
