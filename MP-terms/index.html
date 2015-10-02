@@ -25,7 +25,7 @@
 
             div#controls {
                 float:left;
-                text-align: left;
+                text-align: center;
                 padding-top:30px;
                 padding-left:40px;
                 width: 30%;
@@ -46,8 +46,9 @@
 
             div#middle {
                 width: 850px;
-                height: 430px;
+                height: 440px;
                 margin-top: 10px;
+                margin-bottom: 20px;
             }
 
             div#seats {
@@ -143,15 +144,13 @@
                     <div id="controls">
 
                         <!--<p id="sliderText">term threshold: 1</p>-->
-                        <p id="sliderText">próg kadencji: 1</p>
+                        <p id="sliderText" style="text-align:center">próg kadencji: 1</p>
                         
                         <input type=range min=1 max=7 value=1 class=vertical orient=horizontal></input>
                         <br />
-                        Suwak służy do wyróżniania <em>długoterminowych</em> posłów. Np. '5' oznacza, że wyróżnieni zostaną tylko posłowie, którzy w Sejmie zasiadają od pięciu kadencji lub dłużej.
+                    <p style='text-align: left' lang='pl'>Suwak służy do wyróżniania <em>długoterminowych</em> posłów. Np. '5' oznacza, że wyróżnieni zostaną tylko posłowie, którzy w Sejmie zasiadają od pięciu kadencji lub dłużej.</p>
                         
-                        <br /><br />
-                    
-                        Wykres po lewej przedstawia wszystkich posłów w Sejmie; kolory oznaczają przynależność do klubów. Np. jest 35 posłów, których obecna kadencja jest czwartą z rzędu.
+                    <p style='text-align: left' lang='pl'>Wykres po lewej przedstawia wszystkich posłów w Sejmie; kolory oznaczają przynależność do klubów. Np. jest 35 posłów, których obecna kadencja jest czwartą z rzędu, a ponad 30% (165) posłów jest w Sejmie pierwszy raz (lub pierwszy raz po przerwie).</p>
 
 
                     </div>
@@ -159,7 +158,7 @@
                     <div id='histogram'>
                         <!--<h2>ALL MPs</h2>-->
                         <h2>WSZYSCY POSŁOWIE</h2>
-                        <svg width=520 height=330 id='histogram'></svg>
+                        <svg width=520 height=370 id='histogram'></svg>
                         
 
                     </div>
@@ -282,10 +281,10 @@
                 
                 if (main_histogram == true) {
                     var bar_width = 40;
-                    var histogram_height = 280;
+                    var histogram_height = 320;
                     var bar_separation = 58;
                     var group_xtranslation = 0;
-                    var group_ytranslation = 100;
+                    var group_ytranslation = 140;
                     var svg = svgHisto;
                     var histoGroup_xoffset = 80;
                 }
